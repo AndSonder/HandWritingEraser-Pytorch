@@ -17,7 +17,7 @@ class HWSegmentation(data.Dataset):
                                            'has_instances', 'ignore_in_eval', 'color'])
 
     classes = [
-        HandWClass('None', 0, 0, 'void', 0, False, True, (128, 64, 128)),
+        HandWClass('None', 0, 0, 'void', 0, False, True, (255, 255, 255)),
         HandWClass('background', 1, 1, 'void', 0, False, True, (128, 64, 128)),
         HandWClass('handwriting', 2, 2, 'void', 0, False, True, (244, 35, 232)),
     ]
@@ -61,11 +61,9 @@ class HWSegmentation(data.Dataset):
             tuple: (image, target) where target is a tuple of all target types if target_type is a list with more
             than one item. Otherwise target is a json object if target_type="polygon", else the image segmentation.
         """
-        print(len(self.images))
-        print(len(self.targets))
         image = Image.open(self.images[index]).convert('RGB')
         target = Image.open(self.targets[index])
-        if self.transform:
+        if self.transform is not None:
             image, target = self.transform(image, target)
         target = self.encode_target(target)
         return image, target

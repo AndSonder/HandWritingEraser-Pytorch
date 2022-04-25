@@ -34,7 +34,7 @@ def get_argparser():
                               not (name.startswith("__") or name.startswith('_')) and callable(
         network.modeling.__dict__[name])
                               )
-    parser.add_argument("--model", type=str, default='deeplabv3plus_mobilenet',
+    parser.add_argument("--model", type=str, default='deeplabv3plus_resnet50',
                         choices=available_models, help='model name')
     parser.add_argument("--separable_conv", action='store_true', default=False,
                         help="apply separable conv to decoder and aspp")
@@ -53,7 +53,7 @@ def get_argparser():
     parser.add_argument("--step_size", type=int, default=10000)
     parser.add_argument("--crop_val", action='store_true', default=False,
                         help='crop validation (default: False)')
-    parser.add_argument("--batch_size", type=int, default=16,
+    parser.add_argument("--batch_size", type=int, default=4,
                         help='batch size (default: 16)')
     parser.add_argument("--val_batch_size", type=int, default=4,
                         help='batch size for validation (default: 4)')
@@ -65,7 +65,7 @@ def get_argparser():
 
     parser.add_argument("--loss_type", type=str, default='cross_entropy',
                         choices=['cross_entropy', 'focal_loss'], help="loss type (default: False)")
-    parser.add_argument("--gpu_id", type=str, default='0',
+    parser.add_argument("--gpu_id", type=str, default='2',
                         help="GPU ID")
     parser.add_argument("--weight_decay", type=float, default=1e-4,
                         help='weight decay (default: 1e-4)')
@@ -81,7 +81,7 @@ def get_argparser():
     # Visdom options
     parser.add_argument("--enable_vis", action='store_true', default=False,
                         help="use visdom for visualization")
-    parser.add_argument("--vis_port", type=str, default='13570',
+    parser.add_argument("--vis_port", type=str, default='8097',
                         help='port for visdom')
     parser.add_argument("--vis_env", type=str, default='main',
                         help='env for visdom')
@@ -95,14 +95,15 @@ def get_dataset(opts):
     """
     train_transform = et.ExtCompose(
         [
-            et.ExtResize(1024),
-            et.ExtColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
+            et.ExtResize([1024, 1024]),
             et.ExtToTensor(),
-            et.ExtNormalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+            et.ExtColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
+            et.ExtNormalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
         ]
     )
     eval_transforms = et.ExtCompose([
-        et.ExtResize(1024),
+        et.ExtResize([1024, 1024]),
+        et.ExtToTensor(),
         et.ExtNormalize(
             mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
     ])
@@ -124,7 +125,6 @@ def validate(opts, model, loader, device, metrics, ret_samples_ids=None):
 
     with torch.no_grad():
         for i, (images, labels) in tqdm(enumerate(loader)):
-
             images = images.to(device, dtype=torch.float32)
             labels = labels.to(device, dtype=torch.long)
 
@@ -201,7 +201,6 @@ def main():
         shuffle=True,
         num_workers=2
     )
-
 
     model = network.modeling.deeplabv3plus_resnet50(num_classes=opts.num_classes, output_stride=opts.output_stride)
     if opts.separable_conv and 'plus' in opts.model:
@@ -306,8 +305,8 @@ def main():
                 interval_loss = 0.0
 
             if (cur_itrs) % opts.val_interval == 0:
-                save_ckpt('checkpoints/latest_%s_%s_os%d.pth' %
-                          (opts.model, opts.dataset, opts.output_stride))
+                save_ckpt('checkpoints/latest_%s_os%d.pth' %
+                          (opts.model, opts.output_stride))
                 print("validation...")
                 model.eval()
                 val_score, ret_samples = validate(
@@ -316,8 +315,8 @@ def main():
                 print(metrics.to_str(val_score))
                 if val_score['Mean IoU'] > best_score:  # save best model
                     best_score = val_score['Mean IoU']
-                    save_ckpt('checkpoints/best_%s_%s_os%d.pth' %
-                              (opts.model, opts.dataset, opts.output_stride))
+                    save_ckpt('checkpoints/best_%s_os%d.pth' %
+                              (opts.model, opts.output_stride))
 
                 if vis is not None:  # visualize validation score and samples
                     vis.vis_scalar("[Val] Overall Acc", cur_itrs, val_score['Overall Acc'])
@@ -337,6 +336,7 @@ def main():
                 return
 
 
-# python3 main.py --data_root /home/disk2/ray/datasets/HandWriting --loss_type focal_loss --gpu_id 2
+# python3 main.py --data_root /home/disk2/ray/datasets/HandWriting --loss_type focal_loss --gpu_id 2 --batch_size 4
+# python3 main.py --data_root /home/disk2/ray/datasets/HandWriting --loss_type focal_loss --gpu_id 2 --batch_size 4 --ckpt checkpoints/best_deeplabv3plus_resnet50_os16.pth --test_only --save_val_results
 if __name__ == '__main__':
     main()

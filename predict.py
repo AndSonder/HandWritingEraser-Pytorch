@@ -61,12 +61,7 @@ def get_argparser():
 
 def main():
     opts = get_argparser().parse_args()
-    if opts.dataset.lower() == 'voc':
-        opts.num_classes = 21
-        decode_fn = VOCSegmentation.decode_target
-    elif opts.dataset.lower() == 'cityscapes':
-        opts.num_classes = 19
-        decode_fn = Cityscapes.decode_target
+    opts.num_classes = 2
 
     os.environ['CUDA_VISIBLE_DEVICES'] = opts.gpu_id
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

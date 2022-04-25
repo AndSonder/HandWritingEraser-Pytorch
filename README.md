@@ -16,9 +16,15 @@ Pytorch 1.7+
 pip install requirements.txt
 ```
 
-## Datasets
+## Datasets And Pretrained model
 
 We use one dataset supported by Baidu Aistdio at https://aistudio.baidu.com/aistudio/datasetdetail/121039 
+
+You can use the flowing links to download the Pretrained model and the datasets.
+
+Pretrained model: 
+
+Datasets: 
 
 ## Optimized result
 
@@ -30,7 +36,27 @@ To optimize the segmentation result we use the tracks as follows:
 
 ## The Result of the model
 
-Our model receives the 0.81 MAP in the test dataset.
+| Overall Acc | Mean Acc | FreqW Acc | Mean IoU |
+| ----------- | -------- | --------- | -------- |
+| 0.990181    | 0.905337 | 0.981430  | 0.860488 |
+
+### Train your own model
+
+After downloading the ckpt and datasets, you can use :
+
+```
+python3 main.py --data_root /home/disk2/ray/datasets/HandWriting --loss_type focal_loss --gpu_id 2 --batch_size 4
+```
+
+to train your own model.
+
+You can also use:
+
+```
+python3 main.py --data_root /home/disk2/ray/datasets/HandWriting --loss_type focal_loss --gpu_id 2 --batch_size 4 --ckpt checkpoints/best_deeplabv3plus_resnet50_os16.pth --test_only --save_val_results
+```
+
+to test your model.
 
 ### Some results
 
@@ -38,6 +64,7 @@ Our model receives the 0.81 MAP in the test dataset.
 
 ![image-20220425204005046](images/image-20220425204005046.png)
 
+![image-20220425223720962](images/image-20220425223720962.png)
 
 ## References
 
