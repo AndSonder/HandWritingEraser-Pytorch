@@ -1,5 +1,10 @@
 # HandWriting Eraser
 
+## Introduction
+
+This repo aims to use deeplabv3+ to remove the handwriting on the papers.
+I define the task of removing handwriting as a segmentation task. So we use a segmentation model named Deeplabv3+ to solve this task.
+
 ## Environment
 
 ```
@@ -11,11 +16,9 @@ Pytorch 1.7+
 pip install requirements.txt
 ```
 
-## Introduction
+## Datasets
 
-This repo aims to use deeplabv3+ to remove the handwriting on the papers.
-I define the task of removing handwriting as a segmentation task.
-So we use a segmentation model named Deeplabv3+ to solve this task.
+We use one dataset supported by Baidu Aistdio at https://aistudio.baidu.com/aistudio/datasetdetail/121039 
 
 ## Optimized result
 
@@ -29,9 +32,18 @@ To optimize the segmentation result we use the tracks as follows:
 
 Our model receives the 0.81 MAP in the test dataset.
 
-### some results
+### Some results
 
 ![image-20220425203938163](images/image-20220425203938163.png)
 
 ![image-20220425204005046](images/image-20220425204005046.png)
+
+
+## References
+
+[1] [Rethinking Atrous Convolution for Semantic Image Segmentation](https://arxiv.org/abs/1706.05587)
+
+[2] [Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation](https://arxiv.org/abs/1802.02611)
+
+[3] [DeepLabV3Plus-Pytorch](https://github.com/VainF/DeepLabV3Plus-Pytorch)
 
