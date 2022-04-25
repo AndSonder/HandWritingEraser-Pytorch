@@ -1,0 +1,14 @@
+__pycache__
+VOCdevkit
+checkpoints
+.vscode
+.DS
+*.pyc
+.idea/
+__pycache__
+results
+checkpoints_bak
+datasets/data/cityscapes
+test_results
+a.py
+get_date.py

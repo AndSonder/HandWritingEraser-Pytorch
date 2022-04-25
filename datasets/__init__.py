@@ -1,0 +1,1 @@
+from .handwriting import HWSegmentation
