@@ -17,9 +17,9 @@ class HWSegmentation(data.Dataset):
                                            'has_instances', 'ignore_in_eval', 'color'])
 
     classes = [
-        HandWClass('None', 0, 0, 'void', 0, False, True, (255, 255, 255)),
-        HandWClass('background', 1, 1, 'void', 0, False, True, (128, 64, 128)),
-        HandWClass('handwriting', 2, 2, 'void', 0, False, True, (244, 35, 232)),
+        HandWClass('background', 0, 0, 'void', 0, False, False, (255, 255, 255)),
+        HandWClass('hand', 1, 1, 'void', 0, False, False, (128, 64, 128)),
+        HandWClass('print', 2, 2, 'void', 0, False, False, (244, 35, 232)),
     ]
 
     train_id_to_color = [c.color for c in classes]
@@ -29,6 +29,7 @@ class HWSegmentation(data.Dataset):
     def __init__(self, root, transform=None, train=True):
         self.images = os.listdir(os.path.join(root, 'Images'))
         self.targets = os.listdir(os.path.join(root, 'Labels'))
+        print(root, " images number:", len(self.images))
         for item in self.images:
             if item not in self.images:
                 self.images.remove(item)

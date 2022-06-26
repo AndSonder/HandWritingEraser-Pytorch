@@ -22,6 +22,7 @@ from torchvision import transforms
 from datasets import HWSegmentation
 
 
+
 def get_argparser():
     parser = argparse.ArgumentParser()
 
@@ -34,7 +35,7 @@ def get_argparser():
                               not (name.startswith("__") or name.startswith('_')) and callable(
         network.modeling.__dict__[name])
                               )
-    parser.add_argument("--model", type=str, default='deeplabv3plus_resnet50',
+    parser.add_argument("--model", type=str, default='deeplabv3plus_resnet101',
                         choices=available_models, help='model name')
     parser.add_argument("--separable_conv", action='store_true', default=False,
                         help="apply separable conv to decoder and aspp")
@@ -79,7 +80,7 @@ def get_argparser():
                         help="download datasets")
 
     # Visdom options
-    parser.add_argument("--enable_vis", action='store_true', default=False,
+    parser.add_argument("--enable_vis", action='store_true', default=True,
                         help="use visdom for visualization")
     parser.add_argument("--vis_port", type=str, default='8097',
                         help='port for visdom')
@@ -166,9 +167,13 @@ def validate(opts, model, loader, device, metrics, ret_samples_ids=None):
     return score, ret_samples
 
 
+
+def visual_test_result(test_path, save_path):
+    pass
+
 def main():
     opts = get_argparser().parse_args()
-    opts.num_classes = 2
+    opts.num_classes = 3
 
     # Setup visualization
     vis = Visualizer(port=opts.vis_port,
@@ -202,7 +207,7 @@ def main():
         num_workers=2
     )
 
-    model = network.modeling.deeplabv3plus_resnet50(num_classes=opts.num_classes, output_stride=opts.output_stride)
+    model = network.modeling.deeplabv3plus_resnet101(num_classes=opts.num_classes, output_stride=opts.output_stride)
     if opts.separable_conv and 'plus' in opts.model:
         network.convert_to_separable_conv(model.classifier)
     utils.set_bn_momentum(model.backbone, momentum=0.01)
