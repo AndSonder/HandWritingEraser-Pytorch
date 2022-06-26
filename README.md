@@ -60,7 +60,7 @@ to test your model and generate the predicted result at `./result`.
 
 ### Some results
 
-![2](images/2-0930708.png)
+![2](images/3.png)
 
 
 
